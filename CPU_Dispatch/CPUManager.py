@@ -36,7 +36,7 @@ class Task():
         self.progress =0
 
     def __str__(self):
-        return (self.name+":a"+str(self.arrive_time)+",n"+str(self.need_time)+",w"+str(self.wait_time))
+        return (self.name+":a"+str(self.arrive_time)+",n"+str(self.need_time)+",w"+str(self.wait_time)+",p"+str(self.progress))
 
 class CPUManager():
 
@@ -64,13 +64,15 @@ class CPUManager():
         self.task_wait = task_list
         self.debug = debug
         cpu_pool = 0
-        # if(task_list.__len__()>0):
-        #     self.task_in_service = task_list.pop(0) #开始执行第一个任务
-        #     print("start task: %s" % self.task_in_service)
 
 
     def execute(self,mode:CPU_Mode,time_slice:int = 1 ):
+
             self.mode = mode
+            if(self.debug):
+                print("Using mode: %s "% self.mode)
+
+
             if(self.mode==CPU_Mode.RR):
                 self.time_slice = time_slice
             while(True):
@@ -80,10 +82,10 @@ class CPUManager():
 
         # time.sleep(0.2)
         if(self.debug):
-            print(bcolors.ENDC+"time: %d "% self.time_now)
+            print(bcolors.ENDC+"============time: %d==============="% self.time_now)
 
 
-
+        #检查是否有进程到达
         for t in self.task_wait[:]:
             if(self.time_now==t.arrive_time):
                 if(self.debug):
@@ -93,11 +95,12 @@ class CPUManager():
                     #最短作业优先则按照需求时间排序
                     self.task_ready.sort(key=lambda x:x.need_time)
 
-
+        # 若没有任务,则加载任务
         if(self.task_in_service==None):
             if(self.task_ready.__len__()>0):
                 #开始执行最新的一个任务
                 self.task_in_service = self.task_ready.pop(0)
+                self.time_slice_used = 0
                 if(self.debug):
                     print(bcolors.WARNING+"start task: %s" % self.task_in_service)
             else:
@@ -105,36 +108,53 @@ class CPUManager():
                     #全部任务执行完毕
                     self.print_res() #打印结果
                     exit(0) #退出
+
+        #检查是否上一次有没做完的进程
+        if (self.mode == CPU_Mode.RR and self.task_in_service is not None):
+
+            if (self.time_slice_used == self.time_slice):
+                #若当前进程已使用完时间片,则切换进程
+                self.task_ready.append(self.task_in_service)
+                self.task_in_service = self.task_ready.pop(0)
+                if (self.debug == True):
+                    print(bcolors.OKBLUE + "task changed to: %s" % self.task_in_service)
+
+                self.time_slice_used = 0
+
+
+        #打印这一时刻执行的任务
+        if(self.debug):
+            if(self.task_in_service==None):
+                print(bcolors.HEADER + "run -> None")
+            else:
+                print(bcolors.HEADER+"run -> %s" % self.task_in_service)
+
+        #执行任务
+        self.task_in_service.progress += 1
+
+
+
+        if(self.task_in_service.progress==self.task_in_service.need_time):
+            # 若当前任务执行完毕
+            self.task_in_service.finish_time = self.time_now #记录下完成时间
+            self.res.append(self.task_in_service)
+
+            if(self.debug):
+                print(bcolors.OKGREEN+"task finish : %s" % self.task_in_service)
+
+            self.task_in_service=None
+            self.time_slice_used = 0
         else:
-            self.task_in_service.progress += 1
+            #若当前任务未结束,则已使用时间片计数+1
+            self.time_slice_used += 1
 
-            if(self.task_in_service.progress==self.task_in_service.need_time):
-                #当前任务执行完毕
 
-                self.task_in_service.finish_time = self.time_now #记录下完成时间
-
-                self.res.append(self.task_in_service)
-                if(self.debug):
-                    print(bcolors.OKGREEN+"task finish : %s" % self.task_in_service)
-                self.task_in_service=None
-
-            elif(self.mode==CPU_Mode.RR):
-                #当前任务尚未执行完毕
-
-                self.time_slice_used += 1 #当前进程已使用的时间片
-
-                if(self.time_slice_used==self.time_slice):
-                    #当前进程已使用完时间片
-                    self.task_ready.append(self.task_in_service)
-                    self.task_in_service = self.task_ready.pop(0)
-                    if(self.debug==True):
-                        print(bcolors.OKBLUE+"task changed to: %s" % self.task_in_service)
-
-                    self.time_slice_used=0
 
 
         for t in self.task_ready:
             t.wait_time+=1 #就绪队列中的任务等待时间+1
+
+
 
         self.time_now +=1
 
