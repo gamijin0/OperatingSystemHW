@@ -12,6 +12,6 @@ with open("data.txt") as f:
 
 
 one = CPUManager(task_list,debug=True)
-one.execute(mode=CPU_Mode.RR,time_slice=3)
+one.execute(mode=CPU_Mode.PNS,time_slice=1)
 
 

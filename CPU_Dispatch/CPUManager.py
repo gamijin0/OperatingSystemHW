@@ -14,6 +14,7 @@ class bcolors:
 class CPU_Mode(Enum):
     SJF = 1
     RR = 2
+    PNS = 3
 
 
 class Task():
@@ -36,7 +37,7 @@ class Task():
         self.progress =0
 
     def __str__(self):
-        return (self.name+":a"+str(self.arrive_time)+",n"+str(self.need_time)+",w"+str(self.wait_time)+",p"+str(self.progress))
+        return (self.name+":a"+str(self.arrive_time)+",n"+str(self.need_time)+",w"+str(self.wait_time)+",pro"+str(self.progress)+ ",pri" + str(self.priority))
 
 class CPUManager():
 
@@ -94,7 +95,8 @@ class CPUManager():
                 if(self.mode==CPU_Mode.SJF):
                     #最短作业优先则按照需求时间排序
                     self.task_ready.sort(key=lambda x:x.need_time)
-
+                elif(self.mode==CPU_Mode.PNS):
+                    self.task_ready.sort(key=lambda x:x.priority,reverse=True)
         # 若没有任务,则加载任务
         if(self.task_in_service==None):
             if(self.task_ready.__len__()>0):
@@ -170,3 +172,6 @@ class CPUManager():
             for j in range(nt):
                 print(bcolors.OKGREEN+"#",end='')
             print(bcolors.OKBLUE + "]",end='')
+
+        print("\n\n平均响应时间: %.1f" % (sum(i.wait_time for i in self.res)/len(self.res)))
+        print("\n平均周转时间: %.1f" % (((sum(i.wait_time for i in self.res)+sum(i.need_time for i in self.res))/len(self.res))))
