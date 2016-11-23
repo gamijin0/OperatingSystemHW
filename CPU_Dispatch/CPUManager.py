@@ -12,9 +12,9 @@ class bcolors:
     ENDC = '\033[0m'
 
 class CPU_Mode(Enum):
-    SJF = 1
-    RR = 2
-    PNS = 3
+    SJF = 1 #短作业优先
+    RR = 2 #时间片轮转
+    PNS = 3 #优先级
 
 
 class Task():
@@ -70,12 +70,13 @@ class CPUManager():
     def execute(self,mode:CPU_Mode,time_slice:int = 1 ):
 
             self.mode = mode
-            if(self.debug):
-                print("Using mode: %s "% self.mode)
-
-
+            # if(self.debug):
+            print("Using mode: %s "% self.mode)
             if(self.mode==CPU_Mode.RR):
                 self.time_slice = time_slice
+                print("Time slice: %d" % self.time_slice)
+
+
             while(True):
                 self.cpu_run()
 
