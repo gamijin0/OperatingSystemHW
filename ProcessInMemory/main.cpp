@@ -35,9 +35,16 @@ int main() {
             TCHAR* procName = new TCHAR[MAX_PATH];
             GetModuleFileNameEx(hOneProcess, NULL, procName, MAX_PATH);
 
-            cout<<"PID:\t"<<processIds[i]<<"\t进程名:\t"<<procName
-                <<"\n当前使用的内存:\t"<<info.PeakWorkingSetSize/1024/1024<<"MB"
-                <<"\t缺页中断次数:"<<info.PageFaultCount
+            cout<<"PID:\t"<<processIds[i]<<"\n\t进程名:\t"<<procName
+                <<"\n\t当前使用的内存:\t"<<info.WorkingSetSize/1024/1024<<"MB"
+                <<"\n\t使用内存高峰:"<<info.PeakWorkingSetSize/1024/1024<<"MB"
+                <<"\n\t缺页中断次数:"<<info.PageFaultCount
+                <<"\n\t使用页面缓存池高峰:"<<info.QuotaPeakPagedPoolUsage
+                <<"\n\t使用页面缓存池:"<<info.QuotaPagedPoolUsage
+                <<"\n\t使用非分页缓存池高峰:"<<info.QuotaPeakNonPagedPoolUsage
+                <<"\n\t使用非分页缓存池:"<<info.QuotaNonPagedPoolUsage
+                <<"\n\t使用分页文件:"<<info.PagefileUsage
+                <<"\n\t使用分页文件高峰:"<<info.PeakPagefileUsage
                 <<endl;
         }
 
