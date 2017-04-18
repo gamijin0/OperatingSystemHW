@@ -67,12 +67,9 @@ def patchPartition(partition,contents):
 
     operator,left,right = getOperatorList(partition[0])
 
-    print operator,left,right
 
     if (operator == 'a'):
         right_index = map(lambda s:int(s),right)
-        # print operator, left, right
-        # print (right_index[0],right_index[-1]+1)
         for r in range(right_index[0],right_index[-1]+1):
             lines[r-1] = ""
     if (operator == 'd'):
@@ -114,7 +111,8 @@ def patch(new_filename):
     partition_list = divideIntoPart(lines)
     content = getLinesFromFile(new_filename)
 
-    for partition in partition_list:
+    for index,partition in enumerate(partition_list):
+        print "Patch ==> [%d%%]" % (index*100/len(partition_list))
         content = patchPartition(partition,content)
 
     return content
