@@ -71,12 +71,14 @@ def patchPartition(partition,contents):
 
     if (operator == 'a'):
         right_index = map(lambda s:int(s),right)
-        for r in right_index:
+        # print operator, left, right
+        # print (right_index[0],right_index[-1]+1)
+        for r in range(right_index[0],right_index[-1]+1):
             lines[r-1] = ""
     if (operator == 'd'):
         left_index = map(lambda s: int(s), left)
         right_index = int(right[0])
-        for l_index,l in enumerate(left_index):
+        for l_index,l in enumerate(range(left_index[0],left_index[-1]+1)):
             lines[right_index-1] += "%s\n" % (partition[1+l_index])
     if (operator == 'c'):
         left_index = map(lambda s: int(s), left)
@@ -85,10 +87,10 @@ def patchPartition(partition,contents):
         # new_content_list = partition[1 + len(left_index):]
 
         previous_content = ""
-        for l_index,l in enumerate(left_index):
+        for l_index,l in enumerate(range(left_index[0],left_index[-1]+1)):
             previous_content += partition[1+l_index] + "\n"
 
-        for r_index,r in enumerate(right_index):
+        for r_index,r in enumerate(range(right_index[0],right_index[-1]+1)):
             lines[r-1] = ""
 
         lines[right_index[0]-1] = previous_content
@@ -113,7 +115,6 @@ def patch(new_filename):
     content = getLinesFromFile(new_filename)
 
     for partition in partition_list:
-        # print partition
         content = patchPartition(partition,content)
 
     return content
