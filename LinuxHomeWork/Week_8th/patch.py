@@ -1,3 +1,15 @@
+#Author: JinGaoMing 1427407029
+
+"""
+
+This patch.py is used to output the file of previous version
+with the input of "diff"
+
+Usage: diff <old_file> <new_file> | patch.py -i <inputfile> -o <outputfile>
+
+"""
+
+
 import sys,getopt
 
 
@@ -105,7 +117,10 @@ def getLinesFromFile(filename):
 
     return lines
 
-
+"""
+use the input from diff to generate the previous content of file
+return :the previous content lines list
+"""
 def patch(new_filename):
     lines = getInput()
     partition_list = divideIntoPart(lines)
